@@ -10,73 +10,120 @@ function loadStream() {
         hls = null;
     }
 
+    // Force HLS.js even on Android Chrome
     if (Hls.isSupported()) {
         hls = new Hls({
             enableWorker: true,
             lowLatencyMode: true,
-            backBufferLength: 30,
+            backBufferLength: 0,
+            maxBufferSize: 20 * 1000 * 1000, // 20MB
+            maxBufferLength: 15,
             manifestLoadingTimeOut: 10000,
-            manifestLoadingMaxRetry: 4,
+            manifestLoadingMaxRetry: 6,
             manifestLoadingRetryDelay: 500,
             levelLoadingTimeOut: 10000,
-            levelLoadingMaxRetry: 4,
+            levelLoadingMaxRetry: 6,
             levelLoadingRetryDelay: 500,
             fragLoadingTimeOut: 10000,
-            fragLoadingMaxRetry: 4,
+            fragLoadingMaxRetry: 6,
             fragLoadingRetryDelay: 500,
             startLevel: -1,
-            abrEwmaFastLive: 3,
-            abrEwmaSlowLive: 9,
-            maxBufferLength: 30,
-            maxMaxBufferLength: 60,
-            testBandwidth: true
+            abrEwmaFastLive: 1.5,
+            abrEwmaSlowLive: 3,
+            abrMaxWithRealBitrate: true,
+            progressive: true,
+            xhrSetup: function(xhr) {
+                xhr.withCredentials = false;
+            }
         });
 
-        hls.attachMedia(videoPlayer);
-        hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-            hls.loadSource(streamUrl);
-            hls.startLoad();
+        hls.on(Hls.Events.ERROR, function(event, data) {
+            if (data.fatal) {
+                switch(data.type) {
+                    case Hls.ErrorTypes.NETWORK_ERROR:
+                        console.log('Network error, trying to recover...');
+                        hls.startLoad();
+                        break;
+                    case Hls.ErrorTypes.MEDIA_ERROR:
+                        console.log('Media error, trying to recover...');
+                        hls.recoverMediaError();
+                        break;
+                    default:
+                        console.log('Fatal error, trying to reload...');
+                        initializePlayer();
+                        break;
+                }
+            }
         });
-        hls.on(Hls.Events.MANIFEST_PARSED, playVideo);
-        hls.on(Hls.Events.ERROR, handleHlsError);
-    } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+
+        initializePlayer();
+    } else {
+        console.log('HLS not supported, falling back to native player');
         videoPlayer.src = streamUrl;
         videoPlayer.addEventListener('loadedmetadata', playVideo);
     }
 }
 
-function handleHlsError(_, data) {
-    if (!data.fatal) return;
-
-    switch (data.type) {
-        case Hls.ErrorTypes.NETWORK_ERROR:
-            hls.startLoad();
-            break;
-        case Hls.ErrorTypes.MEDIA_ERROR:
-            hls.recoverMediaError();
-            break;
-        default:
-            setTimeout(loadStream, 1000);
+function initializePlayer() {
+    try {
+        hls.attachMedia(videoPlayer);
+        hls.on(Hls.Events.MEDIA_ATTACHED, function() {
+            console.log('Media attached');
+            hls.loadSource(CONFIG.streamUrl);
+            hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                console.log('Manifest parsed');
+                playVideo();
+            });
+        });
+    } catch (error) {
+        console.error('Error initializing player:', error);
+        setTimeout(loadStream, 2000);
     }
 }
 
 function playVideo() {
-    if (videoPlayer.paused) {
-        const playPromise = videoPlayer.play();
-        if (playPromise) {
-            playPromise.catch(() => {
-                videoPlayer.muted = true;
-                videoPlayer.play();
-            });
+    try {
+        if (videoPlayer.paused) {
+            const playPromise = videoPlayer.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log('Playback error:', error);
+                    // Try muted playback if normal playback fails
+                    videoPlayer.muted = true;
+                    return videoPlayer.play();
+                });
+            }
         }
+    } catch (error) {
+        console.error('Play error:', error);
     }
 }
 
-videoPlayer.addEventListener('error', () => setTimeout(loadStream, 1000));
-videoPlayer.addEventListener('stalled', () => setTimeout(loadStream, 1000));
-document.addEventListener('DOMContentLoaded', loadStream);
+// Handle video errors
+videoPlayer.addEventListener('error', (e) => {
+    console.error('Video error:', e.target.error);
+    setTimeout(loadStream, 2000);
+});
+
+// Handle stalled playback
+videoPlayer.addEventListener('stalled', () => {
+    console.log('Playback stalled, reloading...');
+    setTimeout(loadStream, 2000);
+});
+
+// Handle ended streams
+videoPlayer.addEventListener('ended', () => {
+    console.log('Stream ended, reloading...');
+    loadStream();
+});
+
+// Handle visibility changes
 document.addEventListener('visibilitychange', () => {
     if (!document.hidden && videoPlayer.paused) {
+        console.log('Page visible, resuming...');
         loadStream();
     }
 });
+
+// Initial load
+document.addEventListener('DOMContentLoaded', loadStream);
