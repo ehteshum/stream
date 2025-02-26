@@ -14,17 +14,29 @@ function loadStream() {
         hls = new Hls({
             enableWorker: true,
             lowLatencyMode: true,
-            backBufferLength: 90,
-            manifestLoadingTimeOut: 30000,
-            manifestLoadingMaxRetry: 3,
-            manifestLoadingRetryDelay: 1000,
-            levelLoadingTimeOut: 30000,
-            levelLoadingMaxRetry: 3,
-            levelLoadingRetryDelay: 1000
+            backBufferLength: 30,
+            manifestLoadingTimeOut: 10000,
+            manifestLoadingMaxRetry: 4,
+            manifestLoadingRetryDelay: 500,
+            levelLoadingTimeOut: 10000,
+            levelLoadingMaxRetry: 4,
+            levelLoadingRetryDelay: 500,
+            fragLoadingTimeOut: 10000,
+            fragLoadingMaxRetry: 4,
+            fragLoadingRetryDelay: 500,
+            startLevel: -1,
+            abrEwmaFastLive: 3,
+            abrEwmaSlowLive: 9,
+            maxBufferLength: 30,
+            maxMaxBufferLength: 60,
+            testBandwidth: true
         });
 
         hls.attachMedia(videoPlayer);
-        hls.on(Hls.Events.MEDIA_ATTACHED, () => hls.loadSource(streamUrl));
+        hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+            hls.loadSource(streamUrl);
+            hls.startLoad();
+        });
         hls.on(Hls.Events.MANIFEST_PARSED, playVideo);
         hls.on(Hls.Events.ERROR, handleHlsError);
     } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
@@ -44,21 +56,27 @@ function handleHlsError(_, data) {
             hls.recoverMediaError();
             break;
         default:
-            setTimeout(loadStream, 2000);
+            setTimeout(loadStream, 1000);
     }
 }
 
 function playVideo() {
-    const playPromise = videoPlayer.play();
-    if (playPromise) {
-        playPromise.catch(() => {
-            videoPlayer.muted = true;
-            videoPlayer.play();
-        });
+    if (videoPlayer.paused) {
+        const playPromise = videoPlayer.play();
+        if (playPromise) {
+            playPromise.catch(() => {
+                videoPlayer.muted = true;
+                videoPlayer.play();
+            });
+        }
     }
 }
 
-videoPlayer.addEventListener('error', () => setTimeout(loadStream, 2000));
-videoPlayer.addEventListener('stalled', () => setTimeout(loadStream, 2000));
+videoPlayer.addEventListener('error', () => setTimeout(loadStream, 1000));
+videoPlayer.addEventListener('stalled', () => setTimeout(loadStream, 1000));
 document.addEventListener('DOMContentLoaded', loadStream);
-document.addEventListener('visibilitychange', () => !document.hidden && loadStream());
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && videoPlayer.paused) {
+        loadStream();
+    }
+});
