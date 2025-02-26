@@ -1,4 +1,4 @@
 // Stream configuration
 const CONFIG = {
-    streamUrl: "YOUR_DEFAULT_STREAM_URL_HERE"  // Replace with your M3U8 stream URL
+    streamUrl: "https://a.f1almostback.xyz/madrid/index.m3u8"  // Replace with your M3U8 stream URL
 }; 
