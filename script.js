@@ -10,7 +10,7 @@ function loadStream() {
         hls = null;
     }
 
-    // Force HLS.js even on Android Chrome
+    // fixed android bhaiya
     if (Hls.isSupported()) {
         hls = new Hls({
             enableWorker: true,
@@ -88,7 +88,7 @@ function playVideo() {
             if (playPromise !== undefined) {
                 playPromise.catch(error => {
                     console.log('Playback error:', error);
-                    // Try muted playback if normal playback fails
+                    // for changing mute option ( doesnt work)
                     videoPlayer.muted = true;
                     return videoPlayer.play();
                 });
@@ -99,25 +99,25 @@ function playVideo() {
     }
 }
 
-// Handle video errors
+// if m3u8 error occurs
 videoPlayer.addEventListener('error', (e) => {
     console.error('Video error:', e.target.error);
     setTimeout(loadStream, 2000);
 });
 
-// Handle stalled playback
+// error stalled playback
 videoPlayer.addEventListener('stalled', () => {
     console.log('Playback stalled, reloading...');
     setTimeout(loadStream, 2000);
 });
 
-// Handle ended streams
+// eror ended streams
 videoPlayer.addEventListener('ended', () => {
     console.log('Stream ended, reloading...');
     loadStream();
 });
 
-// Handle visibility changes
+// erorrvvisibility changes
 document.addEventListener('visibilitychange', () => {
     if (!document.hidden && videoPlayer.paused) {
         console.log('Page visible, resuming...');
