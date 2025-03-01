@@ -1,10 +1,7 @@
 const videoPlayer = document.getElementById('videoPlayer');
-const qualitySelector = document.getElementById('qualitySelector');
-const streamStats = document.getElementById('streamStats');
 const loadingOverlay = document.querySelector('.loading-overlay');
 const errorOverlay = document.querySelector('.error-overlay');
 let hls = null;
-let statsInterval = null;
 
 function showLoading(show) {
     loadingOverlay.style.display = show ? 'flex' : 'none';
@@ -13,43 +10,6 @@ function showLoading(show) {
 function showError(show, message = 'Stream error occurred') {
     errorOverlay.style.display = show ? 'flex' : 'none';
     errorOverlay.querySelector('.error-message').textContent = message;
-}
-
-function updateStreamStats() {
-    if (!hls) return;
-    
-    const stats = hls.stats;
-    const level = hls.currentLevel > -1 ? hls.levels[hls.currentLevel] : null;
-    const quality = level ? `${level.height}p` : 'Auto';
-    const bitrate = level ? `${Math.round(level.bitrate / 1000)} Kbps` : 'N/A';
-    const buffer = Math.round(hls.media.buffered.length ? hls.media.buffered.end(0) - hls.media.currentTime : 0);
-    
-    streamStats.innerHTML = `
-        Quality: ${quality}<br>
-        Bitrate: ${bitrate}<br>
-        Buffer: ${buffer}s<br>
-        Dropped Frames: ${stats.droppedFrames}
-    `;
-}
-
-function updateQualityLevels() {
-    if (!hls || !hls.levels) return;
-    
-    // Clear existing options except Auto
-    while (qualitySelector.options.length > 1) {
-        qualitySelector.remove(1);
-    }
-    
-    // Add available qualities
-    hls.levels.forEach((level, index) => {
-        const option = document.createElement('option');
-        option.value = index;
-        option.text = `${level.height}p (${Math.round(level.bitrate / 1000)} Kbps)`;
-        qualitySelector.add(option);
-    });
-    
-    // Set current quality
-    qualitySelector.value = hls.currentLevel === -1 ? 'auto' : hls.currentLevel;
 }
 
 function loadStream() {
@@ -62,10 +22,6 @@ function loadStream() {
     if (hls) {
         hls.destroy();
         hls = null;
-    }
-
-    if (statsInterval) {
-        clearInterval(statsInterval);
     }
 
     if (Hls.isSupported()) {
@@ -103,12 +59,6 @@ function loadStream() {
 
         // Error handling
         hls.on(Hls.Events.ERROR, function(event, data) {
-            console.group('HLS Error');
-            console.log('Error Type:', data.type);
-            console.log('Error Details:', data.details);
-            console.log('Fatal:', data.fatal);
-            console.groupEnd();
-            
             if (data.fatal) {
                 switch(data.type) {
                     case Hls.ErrorTypes.NETWORK_ERROR:
@@ -136,13 +86,8 @@ function loadStream() {
             showLoading(true);
         });
 
-        hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
             showLoading(false);
-            updateQualityLevels();
-            
-            // Start stats monitoring
-            if (statsInterval) clearInterval(statsInterval);
-            statsInterval = setInterval(updateStreamStats, 1000);
         });
 
         // Initialize player
@@ -173,7 +118,6 @@ function playVideo() {
             const playPromise = videoPlayer.play();
             if (playPromise !== undefined) {
                 playPromise.catch(error => {
-                    console.warn('Playback error:', error);
                     if (error.name === 'NotAllowedError') {
                         videoPlayer.muted = true;
                         return videoPlayer.play();
@@ -186,14 +130,6 @@ function playVideo() {
         showError(true, 'Playback error occurred. Please try again.');
     }
 }
-
-// Quality selection
-qualitySelector.addEventListener('change', (e) => {
-    if (!hls) return;
-    
-    const level = e.target.value === 'auto' ? -1 : parseInt(e.target.value);
-    hls.currentLevel = level;
-});
 
 // Error handling
 videoPlayer.addEventListener('error', (e) => {
