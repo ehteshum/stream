@@ -30,7 +30,6 @@ function loadStream() {
             enableWorker: true,
             lowLatencyMode: true,
             backBufferLength: 90,
-            maxBufferSize: 0,
             maxBufferLength: 30,
             manifestLoadingTimeOut: 20000,
             manifestLoadingMaxRetry: 10,
@@ -41,23 +40,11 @@ function loadStream() {
             fragLoadingTimeOut: 20000,
             fragLoadingMaxRetry: 10,
             fragLoadingRetryDelay: 1000,
-            startLevel: -1,
-            defaultAudioCodec: 'mp4a.40.2',
-            progressive: true,
-            xhrSetup: function(xhr, url) {
-                xhr.withCredentials = false;
-                
-                if (!url.startsWith('http')) {
-                    const baseUrl = CONFIG.streamUrl.substring(0, CONFIG.streamUrl.lastIndexOf('/') + 1);
-                    url = baseUrl + url;
-                    xhr.open('GET', url, true);
-                }
-            }
+            startLevel: -1
         };
 
         hls = new Hls(hlsConfig);
 
-        // Error handling
         hls.on(Hls.Events.ERROR, function(event, data) {
             if (data.fatal) {
                 switch(data.type) {
@@ -76,64 +63,46 @@ function loadStream() {
             }
         });
 
-        // Loading states
         hls.on(Hls.Events.MANIFEST_LOADING, () => {
             showLoading(true);
             showError(false);
         });
 
-        hls.on(Hls.Events.MANIFEST_LOADED, () => {
-            showLoading(true);
-        });
-
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
             showLoading(false);
+            playVideo();
         });
 
-        // Initialize player
         try {
             hls.attachMedia(videoPlayer);
             hls.on(Hls.Events.MEDIA_ATTACHED, () => {
                 hls.loadSource(streamUrl);
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    playVideo();
-                });
             });
         } catch (error) {
-            console.error('Error during player initialization:', error);
             showError(true, 'Failed to initialize player. Please try again.');
         }
     } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
-        // For Safari and iOS devices
         videoPlayer.src = streamUrl;
         videoPlayer.addEventListener('loadedmetadata', playVideo);
     } else {
-        showError(true, 'Your browser does not support HLS playback. Please try a different browser.');
+        showError(true, 'Your browser does not support HLS playback.');
     }
 }
 
 function playVideo() {
     try {
         if (videoPlayer.paused) {
-            const playPromise = videoPlayer.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    if (error.name === 'NotAllowedError') {
-                        videoPlayer.muted = true;
-                        return videoPlayer.play();
-                    }
-                });
-            }
+            videoPlayer.play().catch(() => {
+                videoPlayer.muted = true;
+                videoPlayer.play();
+            });
         }
     } catch (error) {
-        console.error('Play error:', error);
-        showError(true, 'Playback error occurred. Please try again.');
+        showError(true, 'Playback error occurred.');
     }
 }
 
-// Error handling
-videoPlayer.addEventListener('error', (e) => {
-    console.error('Video error:', e.target.error);
+videoPlayer.addEventListener('error', () => {
     showError(true, 'Video playback error. Retrying...');
     setTimeout(loadStream, 2000);
 });
@@ -152,20 +121,7 @@ videoPlayer.addEventListener('playing', () => {
     showError(false);
 });
 
-videoPlayer.addEventListener('waiting', () => {
-    showLoading(true);
-});
+videoPlayer.addEventListener('waiting', () => showLoading(true));
+videoPlayer.addEventListener('canplay', () => showLoading(false));
 
-videoPlayer.addEventListener('canplay', () => {
-    showLoading(false);
-});
-
-// Handle visibility changes
-document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && videoPlayer.paused) {
-        loadStream();
-    }
-});
-
-// Initial load
 document.addEventListener('DOMContentLoaded', loadStream);
