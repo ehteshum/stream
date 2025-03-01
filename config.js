@@ -1,3 +1,3 @@
 
 const CONFIG = {
-    streamUrl: "https://cdn.hoichoi24.com/LIVE/video.m3u8"  //link dbo
+    streamUrl: "https://a.iloveformulaone.store/laliga/index.m3u8"  //link dbo
