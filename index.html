@@ -47,6 +47,39 @@
             left: 0;
             object-fit: contain;
         }
+        .controls-overlay {
+            position: absolute;
+            bottom: 60px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 8px;
+            color: white;
+            z-index: 1000;
+            display: none;
+            text-align: right;
+        }
+        .video-container:hover .controls-overlay {
+            display: block;
+        }
+        .quality-selector {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 5px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        .quality-selector option {
+            background: #000;
+            color: white;
+        }
+        .stream-stats {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: right;
+        }
         .title {
             background: linear-gradient(to right, #00dbde, #fc00ff);
             -webkit-background-clip: text;
@@ -88,6 +121,64 @@
         .social-link i {
             margin-right: 6px;
         }
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid transparent;
+            border-top-color: #00dbde;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .error-message {
+            background: rgba(255, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        .retry-button {
+            background: #00dbde;
+            color: black;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .retry-button:hover {
+            background: #00c4c7;
+        }
 
         @media (max-width: 768px) {
             body {
@@ -113,6 +204,9 @@
             .video-container {
                 border-radius: 8px;
             }
+            .controls-overlay {
+                bottom: 70px;
+            }
         }
     </style>
 </head>
@@ -131,6 +225,21 @@
             </div>
 
             <div class="video-container">
+                <div class="loading-overlay">
+                    <div class="loading-spinner"></div>
+                </div>
+                <div class="error-overlay">
+                    <div>
+                        <div class="error-message">Stream error occurred</div>
+                        <button class="retry-button" onclick="loadStream()">Retry</button>
+                    </div>
+                </div>
+                <div class="controls-overlay">
+                    <select class="quality-selector" id="qualitySelector">
+                        <option value="auto">Auto</option>
+                    </select>
+                    <div class="stream-stats" id="streamStats"></div>
+                </div>
                 <video 
                     id="videoPlayer" 
                     controls 
