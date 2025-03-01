@@ -29,18 +29,20 @@ function loadStream() {
             debug: false,
             enableWorker: true,
             lowLatencyMode: true,
-            backBufferLength: 90,
+            backBufferLength: 60,
             maxBufferLength: 30,
-            manifestLoadingTimeOut: 20000,
-            manifestLoadingMaxRetry: 10,
+            manifestLoadingTimeOut: 15000,
+            manifestLoadingMaxRetry: 4,
             manifestLoadingRetryDelay: 1000,
-            levelLoadingTimeOut: 20000,
-            levelLoadingMaxRetry: 10,
+            levelLoadingTimeOut: 15000,
+            levelLoadingMaxRetry: 4,
             levelLoadingRetryDelay: 1000,
-            fragLoadingTimeOut: 20000,
-            fragLoadingMaxRetry: 10,
+            fragLoadingTimeOut: 15000,
+            fragLoadingMaxRetry: 4,
             fragLoadingRetryDelay: 1000,
-            startLevel: -1
+            startLevel: -1,
+            testBandwidth: true,
+            progressive: true
         };
 
         hls = new Hls(hlsConfig);
