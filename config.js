@@ -1,3 +1,3 @@
 const CONFIG = {
-    streamUrl: "https://a.iloveformulaone.store/laliga/index.m3u8"
+    streamUrl: "https://rmtv.akamaized.net/hls/live/2043153/rmtv-es-web/bitrate_3.m3u8"
 };
