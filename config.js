@@ -1,3 +1,3 @@
 const CONFIG = {
-    streamUrl: "https://a2uy.short.gy/BRU-V-AVL(ENG)/TG@ZubayerOp_Official.m3u8"
+    streamUrl: "https://bldcmprod-cdn.toffeelive.com/cdn/live/sony_sports_2_hd/playlist.m3u8"
 };
