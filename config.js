@@ -1,3 +1,3 @@
 const CONFIG = {
-    streamUrl: "http://c4s22.vfruitfairy.com/com1/tracks-v1a1/mono.m3u8"
+    streamUrl: "https://a2uy.short.gy/BRU-V-AVL(ENG)/TG@ZubayerOp_Official.m3u8"
 };
