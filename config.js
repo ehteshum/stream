@@ -1,3 +1,3 @@
 const CONFIG = {
-    streamUrl: "http://kst.moonplex.net:8080/CH2/tracks-v1a1/mono.m3u8"
+    streamUrl: "http://c4s22.vfruitfairy.com/com1/tracks-v1a1/mono.m3u8"
 };
