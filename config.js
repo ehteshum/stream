@@ -1,3 +1,3 @@
 const CONFIG = {
-    streamUrl: "https://bldcmprod-cdn.toffeelive.com/cdn/live/sony_sports_2_hd/playlist.m3u8"
+    streamUrl: "https://1rdk.short.gy/UCL-1/Himel-Op.m3u8"
 };
