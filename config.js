@@ -1,3 +1,3 @@
 const CONFIG = {
-    streamUrl: "https://a.iloveformulaone.store/laliga/index.m3u8"
+    streamUrl: "http://kst.moonplex.net:8080/CH2/tracks-v1a1/mono.m3u8"
 };
