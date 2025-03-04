@@ -1,3 +1,3 @@
 const CONFIG = {
-    streamUrl: "https://1rdk.short.gy/UCL-1/Himel-Op.m3u8"
+    streamUrl: "https://sonyliv.himel-op.top/index.m3u8?event-id=1090470329"
 };
