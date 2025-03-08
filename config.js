@@ -1,3 +1,3 @@
 const CONFIG = {
-    streamUrl: "https://a.iloveformulaone.store/tnt3/index.m3u8"
+    streamUrl: "https://ds.userstrimz.online/laligatv/index.m3u8"
 };
