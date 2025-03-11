@@ -1,3 +1,3 @@
 const CONFIG = {
-    streamUrl: "https://dffgtrdb.vffddd.online:443/bein3/tracks-v1a1/mono.ts.m3u8"
+    streamUrl: "https://dai.google.com/ssai/event/b4syULaIS9uJBor6MB0Gcg/master.m3u8"
 };
