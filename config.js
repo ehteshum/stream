@@ -1,3 +1,3 @@
 const CONFIG = {
-    streamUrl: "https://ds.userstrimz.online/laligatv/index.m3u8"
+    streamUrl: "http://103.163.247.39/local_out/independenttv/video.m3u8?token=At5F1MFZYnciB3"
 };
