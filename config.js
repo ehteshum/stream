@@ -1,3 +1,3 @@
 const CONFIG = {
-    streamUrl: "https://rr.vipstreams.in/s/NcFYzmqOK-o4Qw8zLAaeyJWEavuoFD1ozVHJaj02fI0sUpPHOZFpUjkpsjXvxfKI/qC_ivQ2gYpcEVWYo0SoBhzvWMgrJ7MLjtdCZvIkGK_Hf6kJJVKtZ0PtOdIHr0ZPlo52raUh9ZOi9ZtUXYHK6ZA/0E3lq-YmqhQTft3yqsyCeToOpPikQ88z6T6XlAnscCIyBBmFvCWn39iy4HRq0QQF/strm.m3u8?md5=3IavxP2C5zhoSdpQruAVxQ&expiry=1742070964"
+    streamUrl: "http://103.89.248.30:8082/1LIVE/index.fmp4.m3u8?token=6911612f0d61ef1575b8633c638d582bf9f6c422-5ddc2870a39bf7e046003b6da75e543e-1742073151-1742062351"
 };
