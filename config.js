@@ -1,3 +1,3 @@
 const CONFIG = {
-    streamUrl: "http://103.89.248.30:8082/1LIVE/index.fmp4.m3u8?token=6911612f0d61ef1575b8633c638d582bf9f6c422-5ddc2870a39bf7e046003b6da75e543e-1742073151-1742062351"
+    streamUrl: "https://director.taihotel.asia/v3/director/VE1ZTMyODdlZGE2MTgwLWViYmItNDczNC1kN2NjLWE2Yjg2YzQ4/master.m3u8?md5=qy7pLnEoYNhHRRZShwdmrw&expires=1742197318&ddg=1"
 };
