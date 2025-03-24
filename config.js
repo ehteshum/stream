@@ -1,3 +1,3 @@
 const CONFIG = {
-    streamUrl: "https://bldcmprod-cdn.toffeelive.com/cdn/live/sony_sports_2_hd/playlist.m3u8"
+    streamUrl: "https://live-test.tsports.com/live-02/1080/master_1080p.m3u8"
 };
