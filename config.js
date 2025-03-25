@@ -1,3 +1,3 @@
 const CONFIG = {
-    streamUrl: "https://live-test.tsports.com/live-02/1080/master_1080p.m3u8"
+    streamUrl: "https://live.tsports.com/mobile_hls/tsports_live_2/playlist.m3u8"
 };
